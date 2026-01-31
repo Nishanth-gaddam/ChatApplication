@@ -3,6 +3,7 @@ const Message=require("../models/message.model");
 const cloudinary=require("../utils/Cloudinary");
 // const {io} =require("socket.io");
 const {getRecieverSocketId,io}=require("../utils/socket");
+const {emitUser} =require("../utils/socket")
 module.exports.getUserForSidebar=async (req,res)=>{
   try{
     const loggedInuser=req.user._id;
@@ -50,9 +51,9 @@ module.exports.sendMessage=async(req,res)=>{
         image:ImageUrl
     });
     await newMessage.save();
-    const recieverId=getRecieverSocketId(userTochat);
     //todo:realtime functionality using socketio
-     io.to(recieverId).emit("newMessage",newMessage);
+    emitUser(userTochat,"newMessage",newMessage);
+    console.log("Sucesfully message sent from backend",newMessage);
     res.status(202).json(newMessage);
 
     }catch(error){
